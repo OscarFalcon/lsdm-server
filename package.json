@@ -1,0 +1,9 @@
+{
+  "name": "lsdm-image-server",
+  "version": "0.0.0",
+  "private": true,
+  "dependencies": {
+    "express": "~4.17.0",
+    "mysql": "2.18.1"
+  }
+}
