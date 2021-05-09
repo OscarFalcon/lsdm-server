@@ -69,7 +69,8 @@ const insertImage = function(insertImageReq, onSuccess, onError){
 		insertImageReq.author,
 		insertImageReq.length,
 		insertImageReq.width
-	 ],  function (err, data){
+	 ],
+	 function (err, data){
 		if (err){
 			console.log(err);
 			onError(err);
@@ -78,6 +79,19 @@ const insertImage = function(insertImageReq, onSuccess, onError){
 		}
 	});
 }
+
+const deleteImage = function(imageId, onSuccess, onError){
+	const sql = 'DELETE FROM user_images WHERE id = ?';
+	getConnection().query(sql, [imageId], function (err, data){
+  		if (err){
+  			console.log(err);
+  			onError(err);
+  		} else {
+  			console.log(data);
+  			onSuccess(data);
+  		}
+	});
+};
 
 const getUserImages = function(userid, onSuccess, onError){
 	const sql = 'SELECT * from USER_IMAGES WHERE user_id = ?';
@@ -98,7 +112,8 @@ var databaseManager = {
 	insertUser : insertUser,
 	getUser: getUser,
 	getUserImages: getUserImages,
-	insertImage : insertImage
+	insertImage : insertImage,
+	deleteImage: deleteImage
 };
 
 

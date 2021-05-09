@@ -34,7 +34,7 @@ app.get('/images', auth.authenticateRequest, function (req, res) {
 		req._securitycontext.id,
 		(data)=> {
 			if (data.length > 0){
-				data.forEach( image => image.ref = 'http://localhost:8081/images/' + image.ref )
+				data.forEach( image => image.ref = 'http://localhost:8081/images/' + image.id )
 			}
 			res.status(200).send(data);
 		},
@@ -52,31 +52,52 @@ app.get("/images/:imageId", auth.authenticateRequest, function(req, res, next) {
 		() => {res.sendStatus(500);})
 });
 
+app.delete("/images/:imageId", auth.authenticateRequest, function(req, res, next) {
+	const key = req._securitycontext.id + '/' + req.params.imageId;
+	console.log(key);
+	
+	dbmanager.deleteImage(
+		req.params.imageId,
+		() => {
+			aws.s3DeleteObject(
+				key,
+				(data) => {res.sendStatus(200)},
+				(err) => {res.sendStatus(500)});
+		},
+		() => res.sendStatus(500)
+	);	
+});
+
+
 app.post('/images', auth.authenticateRequest, upload.single('file'), function (req, res) {
 	const userId = req._securitycontext.id;
 	const fileName = req.file.originalname;
-	const path = userId + '/' + fileName;
 	
 	console.log(req.file);
-	console.log(path);
 	
-	var success = false;
-	aws.s3PutObject(
-		path,
-		req.file.buffer,
-		(data) => {
-			dbmanager.insertImage({
-					userId : userId,
-					ref : fileName,
-					title : "",
-					author : "",
-					length : 0,
-					width : 0
-				},
-				(insertData) => {res.sendStatus(200)},
-				(err) => {res.sendStatus(500)})
+	
+	dbmanager.insertImage({
+			userId : userId,
+			ref : fileName,
+			title : "",
+			author : "",
+			length : 0,
+			width : 0
 		},
-		() => {res.sendStatus(500)});
+		(insertData) => {
+			console.log(insertData);
+			
+			const path = userId + '/' + insertData.insertId;
+			console.log(path);
+			aws.s3PutObject(
+				path,
+				req.file.buffer,
+				(data) => {
+					res.sendStatus(200);
+				},
+				() => {res.sendStatus(500)});
+		},
+		(err) => {res.sendStatus(500)});
 });
 
 
