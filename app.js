@@ -1,9 +1,17 @@
 const express = require('express');
 const bodyParser = require("body-parser");
+const multer = require('multer');
 const dbmanager = require('./database/database-manager')
 const auth = require('./utils/auth');
+const aws = require('./utils/aws-util');
 
 const app = express();
+
+const upload = multer({
+  storage: multer.memoryStorage(),
+  // file size limitation in bytes
+  limits: { fileSize: 52428800 },
+});
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
@@ -11,7 +19,7 @@ app.use(bodyParser.json());
 app.use((req, res, next) => {
 	res.append('Access-Control-Allow-Origin', ['*']);
    res.append('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
-   res.append('Access-Control-Allow-Headers', 'Content-Type,Authorization');
+   res.append('Access-Control-Allow-Headers', ['*']);
    next();
 });
 
@@ -27,6 +35,18 @@ app.get('/images', auth.authenticateRequest, function (req, res) {
 		(data)=> {res.status(200).send(data)},
 		()=> {res.sendStatus(500)}
 	)
+});
+
+app.post('/images', auth.authenticateRequest, upload.single('file'), function (req, res) {
+	console.log(req.file);
+	const path = req._securitycontext.id + '/' + req.file.originalname;
+	console.log(path);
+	
+	aws.s3PutObject(
+		path,
+		req.file.buffer,
+		(data) => { res.sendStatus(200); },
+		() => {res.sendStatus(500);})
 });
 
 app.post('/login', function (req, res) {
