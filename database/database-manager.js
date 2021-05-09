@@ -3,7 +3,7 @@ var config = require('../config.json')
 
 var _connection;
 
-var getConnection = function(){
+const getConnection = function(){
 	var connection;
 	
 	console.log()
@@ -27,8 +27,8 @@ var getConnection = function(){
 	return connection;
 }
 
-var insertUser = function(insertUserRequest, onSuccess, onError){
-	var sql = 'INSERT INTO USERS (firstName, lastName, email, display_name, password, status) VALUES (?, ?, ?, ?, ?, ?)';
+const insertUser = function(insertUserRequest, onSuccess, onError){
+	const sql = 'INSERT INTO USERS (firstName, lastName, email, display_name, password, status) VALUES (?, ?, ?, ?, ?, ?)';
 	getConnection().query(
 		sql, 
 		[insertUserRequest.firstName, insertUserRequest.lastName,insertUserRequest.email,
@@ -45,8 +45,8 @@ var insertUser = function(insertUserRequest, onSuccess, onError){
 	});	
 };
 
-var getUser = function(username, password, onSuccess, onError){
-	var sql = 'SELECT id, display_name, firstName, lastName, email, registered_on, status from USERS WHERE display_name = ? and password = ?';
+const getUser = function(username, password, onSuccess, onError){
+	const sql = 'SELECT id, display_name, firstName, lastName, email, registered_on, status from USERS WHERE display_name = ? and password = ?';
 	getConnection().query(sql, [username, password], function (err, data){
 		if (err){
 			console.log(err);
@@ -59,8 +59,28 @@ var getUser = function(username, password, onSuccess, onError){
 	});	
 };
 
-var getUserImages = function(userid, onSuccess, onError){
-	var sql = 'SELECT * from USER_IMAGES WHERE user_id = ?';
+
+const insertImage = function(insertImageReq, onSuccess, onError){
+	const sql = 'INSERT INTO user_images(user_id, ref, title, author, length, width) VALUES (?, ?, ?, ?, ?, ?)';
+	getConnection().query(sql, [
+		insertImageReq.userId,
+		insertImageReq.ref,
+		insertImageReq.title,
+		insertImageReq.author,
+		insertImageReq.length,
+		insertImageReq.width
+	 ],  function (err, data){
+		if (err){
+			console.log(err);
+			onError(err);
+		}else {
+			onSuccess(data);
+		}
+	});
+}
+
+const getUserImages = function(userid, onSuccess, onError){
+	const sql = 'SELECT * from USER_IMAGES WHERE user_id = ?';
 	getConnection().query(sql, [userid], function (err, data){
 		if (err){
 			console.log(err);
@@ -77,7 +97,8 @@ var getUserImages = function(userid, onSuccess, onError){
 var databaseManager = {
 	insertUser : insertUser,
 	getUser: getUser,
-	getUserImages: getUserImages
+	getUserImages: getUserImages,
+	insertImage : insertImage
 };
 
 

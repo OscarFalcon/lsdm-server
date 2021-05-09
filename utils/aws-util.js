@@ -26,9 +26,29 @@ const putBucket = function (path, fileBuffer, onSuccess, onError){
 	});
 }
 
+const getObject = function(key, onSuccess, onError){
+	var params = { Bucket: config.aws.BUCKET, Key: key };
+
+	s3.getObject(params, function(err, data) {
+	  if (err) {
+		  console.log(err);
+		  return onError(err);
+	  }
+	  else{
+		  onSuccess(data);
+	  }
+  });
+}
+
+
+
+
+
+
 module.exports = {
 	
-	s3PutObject : putBucket
+	s3PutObject : putBucket,
+	getObject: getObject
 };
 
 
