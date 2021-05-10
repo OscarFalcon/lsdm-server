@@ -97,7 +97,7 @@ app.post('/images', auth.authenticateRequest, upload.single('file'), function (r
 		(err) => {res.sendStatus(500)});
 });
 
-app.post('/login', auth.authenticateRequest, function (req, res) {
+app.post('/login', function (req, res) {
 	auth.authenticateUser(
 		req.body,
 		(authResponse)=> {res.send(authResponse)},
