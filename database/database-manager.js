@@ -28,7 +28,7 @@ const getConnection = function(){
 }
 
 const insertUser = function(insertUserRequest, onSuccess, onError){
-	const sql = 'INSERT INTO USERS (firstName, lastName, email, display_name, password, status) VALUES (?, ?, ?, ?, ?, ?)';
+	const sql = 'INSERT INTO users (firstName, lastName, email, display_name, password, status) VALUES (?, ?, ?, ?, ?, ?)';
 	getConnection().query(
 		sql, 
 		[insertUserRequest.firstName, insertUserRequest.lastName,insertUserRequest.email,
@@ -46,7 +46,7 @@ const insertUser = function(insertUserRequest, onSuccess, onError){
 };
 
 const getUser = function(username, password, onSuccess, onError){
-	const sql = 'SELECT id, display_name, firstName, lastName, email, registered_on, status from USERS WHERE display_name = ? and password = ?';
+	const sql = 'SELECT id, display_name, firstName, lastName, email, registered_on, status from users WHERE display_name = ? and password = ?';
 	getConnection().query(sql, [username, password], function (err, data){
 		if (err){
 			console.log(err);
@@ -94,7 +94,7 @@ const deleteImage = function(imageId, onSuccess, onError){
 };
 
 const getUserImages = function(userid, onSuccess, onError){
-	const sql = 'SELECT * from USER_IMAGES WHERE user_id = ?';
+	const sql = 'SELECT * from user_images WHERE user_id = ?';
 	getConnection().query(sql, [userid], function (err, data){
 		if (err){
 			console.log(err);

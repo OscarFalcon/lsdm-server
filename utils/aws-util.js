@@ -10,7 +10,7 @@ AWS.config.update({
 
 const putBucket = function (path, fileBuffer, onSuccess, onError){	
 	s3.putObject({
-		Bucket: "wp-large-scale-data-management",
+		Bucket: config.aws.BUCKET,
 		Key: path, 
 		Body: fileBuffer,
 		ACL: 'public-read', 
