@@ -4,6 +4,7 @@ const multer = require('multer');
 const dbmanager = require('./database/database-manager')
 const auth = require('./utils/auth');
 const aws = require('./utils/aws-util');
+var config = require('./config.json');
 
 const app = express();
 
@@ -34,7 +35,7 @@ app.get('/images', auth.authenticateRequest, function (req, res) {
 		req._securitycontext.id,
 		(data)=> {
 			if (data.length > 0){
-				data.forEach( image => image.ref = 'http://localhost:8081/images/' + image.id )
+				data.forEach( image => image.ref = config.service = '/images/' + image.id )
 			}
 			res.status(200).send(data);
 		},
@@ -68,14 +69,10 @@ app.delete("/images/:imageId", auth.authenticateRequest, function(req, res, next
 	);	
 });
 
-
 app.post('/images', auth.authenticateRequest, upload.single('file'), function (req, res) {
 	const userId = req._securitycontext.id;
 	const fileName = req.file.originalname;
-	
-	console.log(req.file);
-	
-	
+		
 	dbmanager.insertImage({
 			userId : userId,
 			ref : fileName,
@@ -100,14 +97,12 @@ app.post('/images', auth.authenticateRequest, upload.single('file'), function (r
 		(err) => {res.sendStatus(500)});
 });
 
-
-app.post('/login', function (req, res) {
+app.post('/login', auth.authenticateRequest, function (req, res) {
 	auth.authenticateUser(
 		req.body,
 		(authResponse)=> {res.send(authResponse)},
 		()=> {res.sendStatus(401)},
 		()=>{res.sendStatus(500)});
-	
 });
 
 app.post('/signup', function (req, res) {
