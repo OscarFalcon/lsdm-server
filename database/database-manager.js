@@ -7,14 +7,16 @@ var _connectionPool;
 const getConnection = function(){	
 	if (!_connectionPool){
 		var _connectionPool = mysql.createPool({
-			connectionLimit : 10,
+			connectionLimit : 50,
 			host     : config.database.host,
 			user     : config.database.user,
 			password : config.database.password,
 			database : config.database.name
 		});
 		_connectionPool.getConnection(function(err, connection) {
-		    if (err) throw err;
+		    //if (err) throw err;
+			 console.log("Out of connections");
+			 return null;
 		});
 	}
 	
@@ -52,7 +54,6 @@ const getUser = function(username, password, onSuccess, onError){
 		}
 	});	
 };
-
 
 const insertImage = function(insertImageReq, onSuccess, onError){
 	const sql = 'INSERT INTO user_images(user_id, ref, title, author, length, width) VALUES (?, ?, ?, ?, ?, ?)';
@@ -100,7 +101,6 @@ const getUserImages = function(userid, onSuccess, onError){
 		}
 	});	
 }
-
 
 var databaseManager = {
 	insertUser : insertUser,
