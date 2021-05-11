@@ -1,31 +1,24 @@
 var mysql = require('mysql2');
 var config = require('../config.json')
 
-var _connection;
 
-const getConnection = function(){
-	var connection;
-	
-	console.log()
-	if (!_connection){
-		connection = mysql.createPool({
+var _connectionPool;
+
+const getConnection = function(){	
+	if (!_connectionPool){
+		var _connectionPool = mysql.createPool({
 			connectionLimit : 10,
 			host     : config.database.host,
 			user     : config.database.user,
 			password : config.database.password,
 			database : config.database.name
 		});
-		
-		console.log(config);
-
-		connection.connect(function(err) {
+		_connectionPool.getConnection(function(err, connection) {
 		    if (err) throw err;
 		});
-	} else {
-		connection = _connection;
 	}
 	
-	return connection;
+	return _connectionPool;
 }
 
 const insertUser = function(insertUserRequest, onSuccess, onError){
