@@ -8,7 +8,7 @@ const getConnection = function(){
 	
 	console.log()
 	if (!_connection){
-		connection = mysql.createConnection({
+		connection = mysql.createPool({
 			connectionLimit : 10,
 			host     : config.database.host,
 			user     : config.database.user,
