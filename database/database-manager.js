@@ -15,7 +15,9 @@ const getConnection = function(){
 		});
 		_connectionPool.getConnection(function(err, connection) {
 		    //if (err) throw err;
-			 console.log("Out of connections");
+			 if (err){
+				 console.log("Out of connections");
+			 }
 			 return null;
 		});
 	}
@@ -76,14 +78,24 @@ const insertImage = function(insertImageReq, onSuccess, onError){
 }
 
 const deleteImage = function(imageId, onSuccess, onError){
-	const sql = 'DELETE FROM user_images WHERE id = ?';
-	getConnection().query(sql, [imageId], function (err, data){
+	
+	const deleteDups = 'DELETE FROM duplicate_images WHERE image_id = ? OR ref_image_id = ?';
+	getConnection().query(deleteDups, [imageId, imageId], function (err, data){
   		if (err){
   			console.log(err);
   			onError(err);
   		} else {
   			console.log(data);
-  			onSuccess(data);
+			const sql = 'DELETE FROM user_images WHERE id = ?';
+			getConnection().query(sql, [imageId], function (err, data){
+		  		if (err){
+		  			console.log(err);
+		  			onError(err);
+		  		} else {
+		  			console.log(data);
+					onSuccess(data);
+		  		}
+			});
   		}
 	});
 };
@@ -100,14 +112,29 @@ const getUserImages = function(userid, onSuccess, onError){
 			onSuccess(data);
 		}
 	});	
-}
+};
+
+const getDuplicates = function(userid, onSuccess, onError){
+	const sql = 'SELECT id, image_id, ref_image_id, similarity from duplicate_images WHERE user_id = ?';
+	getConnection().query(sql, [userid], function (err, data){
+		if (err){
+			console.log(err);
+			onError(err);
+		}
+		else{
+			console.log(data);
+			onSuccess(data);
+		}
+	});	
+};
 
 var databaseManager = {
 	insertUser : insertUser,
 	getUser: getUser,
 	getUserImages: getUserImages,
 	insertImage : insertImage,
-	deleteImage: deleteImage
+	deleteImage: deleteImage,
+	getDuplicateImages: getDuplicates
 };
 
 

@@ -4,6 +4,7 @@ const multer = require('multer');
 const dbmanager = require('./database/database-manager')
 const auth = require('./utils/auth');
 const aws = require('./utils/aws-util');
+const dupUtil = require('./utils/duplicate-util');
 var config = require('./config.json');
 
 const app = express();
@@ -31,8 +32,9 @@ app.use((req, res, next) => {
 });
 
 app.get('/images', auth.authenticateRequest, function (req, res) {
+	var userId = req._securitycontext.id;
 	dbmanager.getUserImages(
-		req._securitycontext.id,
+		userId,
 		(data)=> {
 			if (data.length > 0){
 				data.forEach( image => image.ref = config.service = '/images/' + image.id )
@@ -95,6 +97,21 @@ app.post('/images', auth.authenticateRequest, upload.single('file'), function (r
 				() => {res.sendStatus(500)});
 		},
 		(err) => {res.sendStatus(500)});
+});
+
+app.get('/duplicates', auth.authenticateRequest, function (req, res) {
+	const userId = req._securitycontext.id;
+	dbmanager.getDuplicateImages(
+		userId,
+		(data)=> { 
+			res.send(dupUtil.mapData(data));
+		},
+		(err)=>{res.sendStatus(500)}
+	);
+	
+	
+	
+	
 });
 
 app.post('/login', function (req, res) {
