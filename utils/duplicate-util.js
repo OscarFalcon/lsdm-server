@@ -21,7 +21,7 @@ const mapData = function(data){
 				returnData[row.image_id].duplicates.push(
 					{
 						id: row.ref_image_id,
-						ref: "/images/" + row.ref_image_id
+						ref: "/service/images/" + row.ref_image_id
 					}
 				);
 			}

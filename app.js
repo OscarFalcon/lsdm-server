@@ -31,7 +31,7 @@ app.use((req, res, next) => {
    next();
 });
 
-app.get('/images', auth.authenticateRequest, function (req, res) {
+app.get('/service/images', auth.authenticateRequest, function (req, res) {
 	var userId = req._securitycontext.id;
 	dbmanager.getUserImages(
 		userId,
@@ -45,7 +45,7 @@ app.get('/images', auth.authenticateRequest, function (req, res) {
 	)
 });
 
-app.get("/images/:imageId", auth.authenticateRequest, function(req, res, next) {
+app.get("/service/images/:imageId", auth.authenticateRequest, function(req, res, next) {
 	const key = req._securitycontext.id + '/' + req.params.imageId;
 	console.log(key);
 	
@@ -55,7 +55,7 @@ app.get("/images/:imageId", auth.authenticateRequest, function(req, res, next) {
 		() => {res.sendStatus(500);})
 });
 
-app.delete("/images/:imageId", auth.authenticateRequest, function(req, res, next) {
+app.delete("/service/images/:imageId", auth.authenticateRequest, function(req, res, next) {
 	const key = req._securitycontext.id + '/' + req.params.imageId;
 	console.log(key);
 	
@@ -71,7 +71,7 @@ app.delete("/images/:imageId", auth.authenticateRequest, function(req, res, next
 	);	
 });
 
-app.post('/images', auth.authenticateRequest, upload.single('file'), function (req, res) {
+app.post('/service/images', auth.authenticateRequest, upload.single('file'), function (req, res) {
 	const userId = req._securitycontext.id;
 	const fileName = req.file.originalname;
 		
@@ -99,7 +99,7 @@ app.post('/images', auth.authenticateRequest, upload.single('file'), function (r
 		(err) => {res.sendStatus(500)});
 });
 
-app.get('/duplicates', auth.authenticateRequest, function (req, res) {
+app.get('/service/duplicates', auth.authenticateRequest, function (req, res) {
 	const userId = req._securitycontext.id;
 	dbmanager.getDuplicateImages(
 		userId,
@@ -108,13 +108,9 @@ app.get('/duplicates', auth.authenticateRequest, function (req, res) {
 		},
 		(err)=>{res.sendStatus(500)}
 	);
-	
-	
-	
-	
 });
 
-app.post('/login', function (req, res) {
+app.post('/service/login', function (req, res) {
 	auth.authenticateUser(
 		req.body,
 		(authResponse)=> {res.send(authResponse)},
@@ -122,7 +118,7 @@ app.post('/login', function (req, res) {
 		()=>{res.sendStatus(500)});
 });
 
-app.post('/signup', function (req, res) {
+app.post('/service/signup', function (req, res) {
 	dbmanager.insertUser(req.body,
 		 (s)=> {res.sendStatus(200)},
 		 (e)=>{res.sendStatus(500)});
